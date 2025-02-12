@@ -1,0 +1,255 @@
+[{
+  "_id": {
+    "$oid": "67a9b3f8d8c571308ac7362a"
+  },
+  "title": "Real Life - Role Plays",
+  "description": "An engaging way for kids to develop communication, creativity, and social skills by acting out different scenarios.",
+  "overview": "Imagine a world where children step into the shoes of doctors, astronauts, shopkeepers, or superheroes—a world where they can express, explore, and learn through play! That’s exactly what a Role-Play Activity offers!\n\nThis interactive session is designed to ignite creativity, boost confidence, and enhance communication skills while making learning fun and immersive. Children will get to act out real-life scenarios, engage in storytelling, and interact with peers, helping them understand emotions, build teamwork, and develop problem-solving skills.\n\nWith exciting themes, costumes, and props, kids will not only enjoy but also gain essential life skills like negotiation, empathy, and decision-making. Whether they’re playing a brave firefighter, a wise teacher, or a kind doctor, every moment in this activity fosters growth and confidence!\n\nCome, watch imagination come to life—let’s make learning an adventure! ",
+  "locationType": "In-Person",
+  "address": {
+    "street": "Mahindra Luminare, Sector 59",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "postalCode": "122102",
+    "country": "India",
+    "latitude": 28.4094598,
+    "longitude": 77.1081655
+  },
+  "ageRange": {
+    "min": 6,
+    "max": 12,
+    "_id": {
+      "$oid": "67a9cf71488dfb7fdf8cae3e"
+    }
+  },
+  "instructor": {
+    "name": "Raghav Sachdeva",
+    "description": "I have 6+ years of experience in teaching students real-life scenarios. ",
+    "imageUrl": "https://utfs.io/f/c3dce1f7-2871-4a3f-b9fd-64095c54c3ff-mj8w2i.jpg",
+    "url": "https://www.google.com"
+  },
+  "imageUrl": "https://utfs.io/f/390abd2e-8959-4105-a3c4-42d6b8a06a5d-wszwhu.jpeg",
+  "startDateTime": {
+    "$date": "2025-02-18T10:00:00.000Z"
+  },
+  "endDateTime": {
+    "$date": "2025-02-18T11:30:00.000Z"
+  },
+  "price": "399",
+  "isFree": false,
+  "category": {
+    "$oid": "67a4c1040e3b3d3bb10cf122"
+  },
+  "organizer": {
+    "$oid": "67a9b18116656ac32caaa75f"
+  },
+  "no_of_tickets": 12,
+  "createdAt": {
+    "$date": "2025-02-10T08:08:24.238Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a9bb78d8c571308ac73667"
+  },
+  "title": "Kids Business Fest",
+  "description": "Unlock your child's potential! A fun, hands-on event where kids run mini businesses, build skills & learn entrepreneurship. 🚀✨",
+  "overview": "Join us for a fun, hands-on event where kids explore entrepreneurship through engaging activities. From running a mini lemonade stand to designing and selling products, children will learn business concepts in an exciting and playful way.\n\nThis event helps kids develop creativity, problem-solving, leadership, and financial literacy—all while having a blast! It’s perfect for parents who want to nurture an entrepreneurial mindset early on.\n\nBy participating, children will gain confidence, teamwork skills, and a sense of independence, setting the foundation for future success.\n\nLimited slots available! Register now to secure your child’s place and give them a chance to dream big, take initiative, and become future leaders!\n\n👉 Register Now!",
+  "locationType": "In-Person",
+  "address": {
+    "street": "Bestech Park View Spa Society",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "postalCode": "122018",
+    "country": "India",
+    "latitude": 28.4277308,
+    "longitude": 77.0503298
+  },
+  "ageRange": {
+    "min": 8,
+    "max": 12,
+    "_id": {
+      "$oid": "67a9f8113707d4ef1b9a2b52"
+    }
+  },
+  "instructor": {
+    "name": "Pawan Pagaria",
+    "description": "Pawan is the Founder & CEO of Neo Risers and a PhD researcher at IIT Delhi’s Design Department. With an M.Des from IIT Delhi and a decade of industry experience at Maruti Suzuki Ltd., he brings deep expertise in design, innovation, and hands-on learning.\n\nAt Neo Risers, Pawan is developing an age-mapped ‘learning by doing’ curriculum for Grades 1-12, designed to foster imagination, creative confidence, and an innovation mindset in children. His approach integrates engaging, open-ended exploration activities with modules on creative maker skills, problem-solving methods, and hands-on tools and techniques.\n\nWith a passion for experiential learning, Pawan is dedicated to empowering young minds through interactive and meaningful educational experiences. His sessions inspire curiosity, encourage critical thinking, and equip children with the skills needed to innovate and lead in the future.",
+    "imageUrl": "https://utfs.io/f/d276260c-0b45-4e17-b2bc-ef7c787fa5bd-gmsnig.png",
+    "url": "https://www.linkedin.com/in/pawanpagaria/"
+  },
+  "imageUrl": "https://utfs.io/f/b674ee57-d004-4302-a458-456ff196e13a-ng6bfi.jpg.webp",
+  "startDateTime": {
+    "$date": "2025-03-01T05:30:00.000Z"
+  },
+  "endDateTime": {
+    "$date": "2025-03-01T08:30:00.000Z"
+  },
+  "price": "799",
+  "isFree": false,
+  "category": {
+    "$oid": "67a9b2feb03e33eb11c00997"
+  },
+  "organizer": {
+    "$oid": "67a73e49ebb7d43e4fd5995a"
+  },
+  "no_of_tickets": 20,
+  "createdAt": {
+    "$date": "2025-02-10T08:40:24.537Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a9d1e0b551e6efb46b9b06"
+  },
+  "title": "Impromptu Storytelling",
+  "description": "Boost your child's confidence with Impromptu Storytelling! A fun event where kids think fast, weave stories, and captivate audiences.",
+  "overview": "Give your child the gift of quick thinking and confident speaking! In our Impromptu Storytelling event, kids (ages 10-14) will develop the ability to think on their feet, craft engaging stories, and captivate an audience—all in a fun and interactive setting. This skill will help them in school, social settings, and future professional life.\n\nThrough exciting prompts and surprise words, they’ll practice turning ideas into compelling narratives, improving communication and creativity.\n\n📅 Limited Slots Available! Register now to secure your child’s spot and watch them become a natural storyteller.\n\n🎟 Sign up today before slots fill up!",
+  "locationType": "In-Person",
+  "address": {
+    "street": "Skyon Apartements",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "postalCode": "122102",
+    "country": "India",
+    "latitude": 28.398564,
+    "longitude": 77.09790009999999
+  },
+  "ageRange": {
+    "min": 8,
+    "max": 14,
+    "_id": {
+      "$oid": "67a9d2a84033694cd3fd97a3"
+    }
+  },
+  "instructor": {
+    "name": "Ruby M",
+    "description": "Public Speaking and Debate champion, certified tutor with more than 9 years of experience",
+    "imageUrl": "https://utfs.io/f/7ac36e49-a53c-4345-838f-4f5cf1cc753d-2092dt.jpeg",
+    "url": "https://www.google.com"
+  },
+  "imageUrl": "https://utfs.io/f/e3096799-86d5-4968-9e06-a7171bd21cee-1nq2cb.jpeg",
+  "startDateTime": {
+    "$date": "2025-03-02T11:30:00.000Z"
+  },
+  "endDateTime": {
+    "$date": "2025-03-02T13:00:00.000Z"
+  },
+  "price": "499",
+  "isFree": false,
+  "category": {
+    "$oid": "67a4c1040e3b3d3bb10cf122"
+  },
+  "organizer": {
+    "$oid": "67a73e49ebb7d43e4fd5995a"
+  },
+  "no_of_tickets": 10,
+  "createdAt": {
+    "$date": "2025-02-10T10:16:00.363Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a9d49ea21f3f0072a36cef"
+  },
+  "title": "Robotics Workshop",
+  "description": "Join us for an exciting Robotics Activity where kids will explore the world of STEM, coding, and hands-on robot building!",
+  "overview": "Imagine a place where kids bring machines to life, designing and programming their very own robots! That’s exactly what our Robotics Activity offers—an exciting, hands-on experience that blends technology, creativity, and problem-solving in a fun and engaging way.\n\nThis interactive session is designed to spark curiosity, build logical thinking, and enhance teamwork while making STEM concepts fun and accessible. Children will get to assemble robots, code simple functions, and complete thrilling challenges, helping them develop critical thinking, innovation, and collaboration skills.\n\nWith robot kits, coding tools, and engaging missions, kids won’t just be learning—they’ll be creating and exploring the future! Whether they’re making a self-driving car, a robotic arm, or a moving animal, every moment in this activity is about invention, discovery, and excitement!\n\nCome, watch young minds innovate—let’s make learning an adventure!",
+  "locationType": "In-Person",
+  "address": {
+    "street": "Parsvnath Exotica, Sector 53",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "postalCode": "122022",
+    "country": "India",
+    "latitude": 28.4412952,
+    "longitude": 77.0981743
+  },
+  "ageRange": {
+    "min": 8,
+    "max": 14,
+    "_id": {
+      "$oid": "67a9d540a21f3f0072a36d15"
+    }
+  },
+  "instructor": {
+    "name": "Milind Khurana ",
+    "description": "Milind Khurana is a seasoned Robotics Instructor and Engineer with over 10 years of experience in building, designing, and teaching robotics to young learners and enthusiasts. ",
+    "imageUrl": "https://utfs.io/f/af296901-778d-4254-8dca-6725092b9b9f-hcmi5q.jpg",
+    "url": "https://www.google.com"
+  },
+  "imageUrl": "https://utfs.io/f/a6fc5c10-472b-42d9-b4da-f3e831c12af5-m57ly8.webp",
+  "startDateTime": {
+    "$date": "2025-02-25T11:30:00.000Z"
+  },
+  "endDateTime": {
+    "$date": "2025-02-25T13:30:00.000Z"
+  },
+  "price": "699",
+  "isFree": false,
+  "category": {
+    "$oid": "67a4c1040e3b3d3bb10cf11c"
+  },
+  "organizer": {
+    "$oid": "67a9b18116656ac32caaa75f"
+  },
+  "no_of_tickets": 20,
+  "createdAt": {
+    "$date": "2025-02-10T10:27:42.068Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67a9d591a21f3f0072a36d20"
+  },
+  "title": "Mini Architect Workshop",
+  "description": "Let your child build a mini house with mini bricks & cement! A fun, hands-on workshop to spark creativity & problem-solving!",
+  "overview": "Give your child a unique hands-on experience in construction and design! In this exciting workshop, kids (ages 6-12) will build a small house using mini bricks, real cement, and safe tools, just like real architects and builders.\n\nThrough this engaging learning-by-doing activity, children will:\n🏗️ Learn the basics of construction – how buildings are made and the importance of structure.\n🧱 Work with real materials – experience hands-on learning with mini bricks and cement.\n🎨 Boost creativity & problem-solving – design, build, and refine their creation.\n🤝 Develop teamwork & patience – collaborate with peers to complete their mini house.\n\nThis activity enhances fine motor skills, focus, and an innovation mindset while making learning exciting and memorable. Guided by experts, children will enjoy a safe and structured environment to explore the world of architecture and construction.\n\nLimited slots available! Don’t miss this opportunity for your child to build, create, and learn like a real architect.\n\n👉 Register Now!",
+  "locationType": "In-Person",
+  "address": {
+    "street": "Bestech Park View Spa Next Society",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "postalCode": "122102",
+    "country": "India",
+    "latitude": 28.3894755,
+    "longitude": 77.05536699999999
+  },
+  "ageRange": {
+    "min": 5,
+    "max": 12,
+    "_id": {
+      "$oid": "67a9f7ddda13ce43b0c50714"
+    }
+  },
+  "instructor": {
+    "name": "Bharat Arora",
+    "description": "Bharat, an IIT Delhi graduate and post-graduate, is a passionate creator who loves building things from the ground up. With a deep interest in hands-on learning, he enjoys teaching kids how to design, experiment, and construct with real materials.\n\nHis approach encourages creativity, problem-solving, and practical thinking, making learning exciting and engaging for young minds. Through his guidance, children will not only build structures but also develop confidence, patience, and an innovation mindset.\n\nJoin Bharat in this fun-filled workshop where kids get to create, explore, and learn like real architects!",
+    "imageUrl": "https://utfs.io/f/648feb43-fa6f-444d-a068-e8910d020f72-ficrh8.png",
+    "url": "https://www.linkedin.com/in/bharatbarora/"
+  },
+  "imageUrl": "https://utfs.io/f/462d135e-502d-4a8c-9312-6180708c0a59-oxh7fs.webp",
+  "startDateTime": {
+    "$date": "2025-03-09T04:30:00.000Z"
+  },
+  "endDateTime": {
+    "$date": "2025-03-09T10:30:00.000Z"
+  },
+  "price": "999",
+  "isFree": false,
+  "category": {
+    "$oid": "67a9b2feb03e33eb11c00997"
+  },
+  "organizer": {
+    "$oid": "67a73e49ebb7d43e4fd5995a"
+  },
+  "no_of_tickets": 12,
+  "createdAt": {
+    "$date": "2025-02-10T10:31:45.624Z"
+  },
+  "__v": 0
+}]
