@@ -10,6 +10,18 @@
       "expo-router"
     ],
     "name": "Parent",
-    "slug": "Parent"
+    "slug": "parents-app",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a32871c3-41af-4225-a26e-261c97da846a"
+      }
+    },
+    "owner": "jatintilwani",
+    "android": {
+      "package": "com.jatintilwani.parentsapp"
+    }
   }
 }

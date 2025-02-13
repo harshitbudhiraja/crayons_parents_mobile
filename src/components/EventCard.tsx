@@ -35,7 +35,7 @@ const EventCard = ({ event }) => {
       <View className="relative">
         <Image 
           source={{ uri: event.imageUrl }} 
-          className="h-40 w-full"
+          className="h-40 w-full aspect-video"
           resizeMode="cover"
         />
         <View 

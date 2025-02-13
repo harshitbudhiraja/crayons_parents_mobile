@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import fakeData from "crayons.events.json";
+import { router } from "expo-router";
 
 const PRIMARY_COLOR = "#624cf5";
 const { width } = Dimensions.get("screen");
@@ -74,7 +75,7 @@ const HomeScreen = () => {
       >
         <Text className="text-white text-xl font-bold">Discover Events</Text>
         <View className="flex-row space-x-4">
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("search")}>
             <Ionicons name="search" size={24} color="white" />
           </TouchableOpacity>
           <TouchableOpacity>
