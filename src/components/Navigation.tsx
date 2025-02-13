@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 
 const PRIMARY_COLOR = "#624cf5";
 
 const BottomNavigation = () => {
   const [activeTab, setActiveTab] = useState("home");
+  const segments = useSegments();
 
+  useEffect(() => {
+    setActiveTab(segments[0]);
+  },[segments[0]])
   const NavButton = ({ icon, name, onPress }) => (
     <TouchableOpacity
       className="flex-1 items-center justify-center"
@@ -20,6 +24,8 @@ const BottomNavigation = () => {
       />
     </TouchableOpacity>
   );
+
+
 
   return (
     <SafeAreaView>
@@ -35,7 +41,7 @@ const BottomNavigation = () => {
           name="home"
           onPress={() => {
             setActiveTab("home");
-            router.replace("/");
+            router.replace("/home");
           }}
         />
         <NavButton
