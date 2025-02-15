@@ -4,15 +4,15 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 const GoogleButton = ({ onPress }) => (
   <TouchableOpacity 
     onPress={onPress}
-    className="h-12 border border-gray-300 rounded-lg gap-3 flex-row items-center justify-start bg-white"
+    className="h-12 border border-gray-300 rounded-lg gap-3 flex-row items-center justify-center bg-white"
   >
     <MaterialCommunityIcons
       name="google"
       size={24}
       color="blue"
-      className="w-5 h-5 pl-3"
+      className="aspect-auto"
     />
-    <Text className="text-gray-700 font-medium flex-1 text-center">Continue with Google</Text>
+    <Text className="text-gray-700 font-medium text-center">Continue with Google</Text>
   </TouchableOpacity>
 );
 

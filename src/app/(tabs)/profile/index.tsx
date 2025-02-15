@@ -22,6 +22,7 @@ import {
   Bell,
   CreditCard,
 } from "lucide-react-native";
+import { useClerk, useUser } from "@clerk/clerk-expo";
 
 interface UserProfile {
   name: string;
@@ -41,7 +42,8 @@ interface MenuItem {
 const ProfileScreen = () => {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  
+  const {user} = useUser();
+  const { signOut } = useClerk();
   // Mock user data - replace with actual user data
   const userProfile: UserProfile = {
     name: "John Doe",
@@ -55,7 +57,7 @@ const ProfileScreen = () => {
       icon: <Ticket size={24} color="#624cf5" />,
       title: "My Tickets",
       subtitle: "View your upcoming & past event tickets",
-      route: "/tickets",
+      route: "/ticket",
     },
     {
       icon: <Calendar size={24} color="#624cf5" />,
@@ -93,27 +95,23 @@ const ProfileScreen = () => {
     // Handle user profile edit
     // Maybe open the clerk modal or something
     console.log("Edit profile clicked");
-  };    
+  };
 
   const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => {
+          signOut();
+          router.push("/login");
         },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: () => {
-            // Handle logout logic here
-            router.push("/login");
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const onRefresh = React.useCallback(() => {
@@ -124,7 +122,13 @@ const ProfileScreen = () => {
     }, 1000);
   }, []);
 
-  const MenuItem = ({ icon, title, subtitle, route, color = "#624cf5" }: MenuItem) => (
+  const MenuItem = ({
+    icon,
+    title,
+    subtitle,
+    route,
+    color = "#624cf5",
+  }: MenuItem) => (
     <TouchableOpacity
       className="flex-row items-center px-4 py-4 bg-white border-b border-gray-100"
       onPress={() => router.push("profile/" + route)}
@@ -143,36 +147,39 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar style="dark" />
-      
+
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        className="mt-4"
       >
         {/* Profile Header */}
         <View className="bg-white px-4 py-6 border-b border-gray-100">
           <View className="flex-row items-center">
             <Image
-              source={{ uri: userProfile.imageUrl }}
+              source={{ uri: user.imageUrl }}
               className="w-20 h-20 rounded-full"
             />
             <View className="ml-4 flex-1">
               <Text className="text-xl font-bold text-gray-800">
-                {userProfile.name}
+                {user.firstName} {user.lastName}
               </Text>
-              <Text className="text-gray-500">{userProfile.email}</Text>
+              <Text className="text-gray-500">{user.emailAddresses[0].emailAddress}</Text>
               <Text className="text-sm text-gray-400 mt-1">
-                {userProfile.joinedDate}
+                {new Date(user.createdAt).toLocaleDateString()}
               </Text>
             </View>
           </View>
-          
+
           <TouchableOpacity
             className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
             onPress={handleUserEdit}
           >
             <User size={20} color="#624cf5" />
-            <Text className="ml-2 text-[#624cf5] font-medium">Edit Profile</Text>
+            <Text className="ml-2 text-[#624cf5] font-medium">
+              Edit Profile
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -205,7 +212,9 @@ const ProfileScreen = () => {
           </View>
           <View className="flex-1 ml-4">
             <Text className="text-base font-semibold text-red-500">Logout</Text>
-            <Text className="text-sm text-gray-500">Sign out of your account</Text>
+            <Text className="text-sm text-gray-500">
+              Sign out of your account
+            </Text>
           </View>
         </TouchableOpacity>
 

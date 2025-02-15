@@ -21,8 +21,8 @@ const EventCard = ({ event }) => {
 
   return (
     <TouchableOpacity 
-      onPress={() => router.push(`/event/${String(event._id.$oid)}`)}
-      className="rounded-xl overflow-hidden bg-white shadow-md mb-2"
+      onPress={() => router.push(`/event/${String(event._id)}`)}
+      className="rounded-xl overflow-hidden bg-white min-w-[70vw] shadow-md mb-2"
       style={{ 
         transform: [{ scale: 1 }],
         shadowColor: "#000",
@@ -35,7 +35,7 @@ const EventCard = ({ event }) => {
       <View className="relative">
         <Image 
           source={{ uri: event.imageUrl }} 
-          className="h-40 w-full aspect-video"
+          className="h-48 w-full"
           resizeMode="cover"
         />
         <View 
@@ -43,7 +43,7 @@ const EventCard = ({ event }) => {
           style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
         >
           <Text className="text-white font-bold">
-            {event.ageRange.min} - {event.ageRange.max} Y
+            {event.ageRange?.min} - {event.ageRange?.max} Y
           </Text>
         </View>
         {event.address.latitude && (
@@ -96,7 +96,7 @@ const EventCard = ({ event }) => {
           <View className="flex-row items-center">
             <Ionicons name="person" size={14} color="gray" />
             <Text className="ml-2 text-xs text-gray-600">
-              {event.organizer.firstName} {event.organizer.lastName}
+              {event.organizer?.firstName} {event.organizer?.lastName}
             </Text>
           </View>
           <TouchableOpacity>

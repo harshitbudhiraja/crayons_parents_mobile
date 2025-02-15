@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EventCard from "@/components/EventCard";
 import Carousel from "react-native-reanimated-carousel";
 import CategoryCard from "@/components/CategoryCard";
@@ -15,6 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import fakeData from "crayons.events.json";
 import { router } from "expo-router";
+import useHttpHook from "@/hooks/useHttpHook";
 
 const PRIMARY_COLOR = "#624cf5";
 const { width } = Dimensions.get("screen");
@@ -76,9 +77,15 @@ const handleCategoryPress = (category) => {
 };
 
 const HomeScreen = () => {
-  const [events] = useState(fakeData);
+  const [events, setEvents] = useState(fakeData);
+  const { fetchData, isLoading } = useHttpHook();
+  useEffect(() => {
+    fetchData(process.env.EXPO_PUBLIC_API_URL + "/events?limit=10").then((events) =>
+      setEvents(events.data)
+    );
+  }, []);
 
-  const renderSectionHeader = (title) => (
+  const renderSectionHeader = (title : string) => (
     <Text className="text-lg font-bold text-gray-800 px-4 mb-2">{title}</Text>
   );
 
@@ -93,9 +100,6 @@ const HomeScreen = () => {
         <View className="flex-row space-x-4">
           <TouchableOpacity onPress={() => router.push("search")}>
             <Ionicons name="search" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="filter" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,17 +143,21 @@ const HomeScreen = () => {
         {/* Upcoming Events Section */}
         <View className="py-4">
           {renderSectionHeader("Upcoming Events")}
-          <FlatList
-            data={events}
-            horizontal={true}
-            renderItem={({ item }) => <EventCard event={item} />}
-            keyExtractor={(item) => item._id.$oid}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-              columnGap: 16,
-            }}
-          />
+          {isLoading ? (
+            <Text> Loading.. </Text>
+          ) : (
+            <FlatList
+              data={events}
+              horizontal={true}
+              renderItem={({ item }) => <EventCard event={item} />}
+              keyExtractor={(item) => item._id.$oid}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                columnGap: 16,
+              }}
+            />
+          )}
         </View>
 
         {/* Popular Events Section */}
