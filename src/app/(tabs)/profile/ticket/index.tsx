@@ -1,75 +1,115 @@
 import {
-    View,
-    SafeAreaView,
-    FlatList,
-    StatusBar,
-  } from "react-native";
-  import Header from "@/components/Header";
-  import TicketCard from "@/components/Ticket";
-  
-  // Types for our ticket data
-  interface Child {
-    firstName: string;
-    lastName: string;
-    gender: string;
-    dob: Date;
-  }
-  
-  interface Event {
-    _id: string;
-    title: string;
-    imageUrl: string;
-  }
-  
-  interface ITicketItem {
-    _id: string;
-    event: Event;
-    totalAmount: number;
-    createdAt: string;
-    child: Child;
-  }
-  
-  const TicketsScreen = () => {
-    // Sample data matching our ticket interface
-    const tickets: ITicketItem[] = [
-      {
-        _id: "1",
-        event: {
-          _id: "evt1",
-          title: "Kids Business Fest",
-          imageUrl: "https://utfs.io/f/b674ee57-d004-4302-a458-456ff196e13a-ng6bfi.jpg.webp",
-        },
-        totalAmount: 1500,
-        createdAt: "2025-03-01T11:00:00.000Z",
-        child: {
-          firstName: "John",
-          lastName: "Doe",
-          gender: "Male",
-          dob: new Date("2015-05-15"),
-        },
-      },
-      {
-        _id: "2",
-        event: {
-          _id: "evt2",
-          title: "Robotics Workshop",
-          imageUrl: "https://utfs.io/f/a6fc5c10-472b-42d9-b4da-f3e831c12af5-m57ly8.webp",
-        },
-        totalAmount: 2000,
-        createdAt: "2025-02-25T14:30:00.000Z",
-        child: {
-          firstName: "Jane",
-          lastName: "Doe",
-          gender: "Female",
-          dob: new Date("2014-08-20"),
-        },
-      },
-    ];
-  
+  View,
+  SafeAreaView,
+  FlatList,
+  StatusBar,
+  ActivityIndicator,
+  Text,
+} from "react-native";
+import { useState, useEffect } from "react";
+import Header from "@/components/Header";
+import TicketCard from "@/components/Ticket";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+
+// Types for our ticket data
+interface Child {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  dob: Date;
+}
+
+interface Event {
+  _id: string;
+  title: string;
+  imageUrl: string;
+}
+
+interface ITicketItem {
+  _id: string;
+  event: Event;
+  totalAmount: number;
+  createdAt: string;
+  child: Child;
+}
+
+const TicketsScreen = () => {
+  const { user } = useUser();
+  const [tickets, setTickets] = useState<ITicketItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const fetchTickets = async () => {
+      if (!user.publicMetadata.userId) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/tickets/user?userId=${user.publicMetadata.userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch tickets');
+        }
+        
+        const data = await response.json();
+        
+        // Only update state if component is still mounted
+        if (isSubscribed) {
+          setTickets(data);
+        }
+      } catch (err) {
+        if (isSubscribed) {
+          setError(err instanceof Error ? err.message : 'Failed to load tickets');
+        }
+      } finally {
+        if (isSubscribed) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchTickets();
+
+    // Cleanup function to prevent setting state on unmounted component
+    return () => {
+      isSubscribed = false;
+    };
+  }, [user.publicMetadata.userId]); // Re-fetch when userId changes
+
+  if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
         <StatusBar barStyle="dark-content" />
         <Header title="My Tickets" />
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        <StatusBar barStyle="dark-content" />
+        <Header title="My Tickets" />
+        <View className="flex-1 justify-center items-center p-4">
+          <Text className="text-red-500 text-center">
+            {error}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle="dark-content" />
+      <Header title="My Tickets" />
+      {tickets.length > 0 ? (
         <FlatList
           data={tickets}
           renderItem={({ item }) => (
@@ -79,8 +119,15 @@ import {
           contentContainerStyle={{ paddingTop: 16, paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         />
-      </SafeAreaView>
-    );
-  };
-  
-  export default TicketsScreen;
+      ) : (
+        <View className="flex-1 justify-center items-center p-4">
+          <Text className="text-gray-500 text-center">
+            No tickets found. Book an event to see your tickets here.
+          </Text>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+};
+
+export default TicketsScreen;

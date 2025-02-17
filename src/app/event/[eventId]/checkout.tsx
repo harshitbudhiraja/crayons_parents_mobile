@@ -1,12 +1,11 @@
-// app/(tabs)/events/[eventId]/checkout.tsx
-
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  ScrollView, 
+  ActivityIndicator, 
   Modal,
+  Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
@@ -29,6 +28,7 @@ interface Event {
   _id: string;
   title: string;
   price: number;
+  isFree?: boolean;
   startDateTime: string;
   imageUrl: string;
   address: Address;
@@ -52,7 +52,7 @@ const Checkout = () => {
     const fetchEvent = async () => {
       try {
         const response = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/events/${eventId}`
+          `${process.env.EXPO_PUBLIC_API_URL}/events/${eventId}`
         );
         const data = await response.json();
         setEvent(data);
@@ -67,11 +67,11 @@ const Checkout = () => {
     }
   }, [eventId]);
 
-  // Fetch children (assuming you have userId stored somewhere)
+  // Fetch children
   const fetchChildren = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/child?userId=${user.publicMetadata.userId}`
+        `${process.env.EXPO_PUBLIC_API_URL}/child?userId=${user?.publicMetadata?.userId}`
       );
       const childrenData = await response.json();
       setChildren(childrenData?.data);
@@ -80,11 +80,13 @@ const Checkout = () => {
       console.error("Error fetching children:", error);
       setError("Failed to load children");
     }
-  }, []);
+  }, [user?.publicMetadata?.userId]);
 
   useEffect(() => {
-    fetchChildren();
-  }, [fetchChildren]);
+    if (user?.publicMetadata?.userId) {
+      fetchChildren();
+    }
+  }, [fetchChildren, user?.publicMetadata?.userId]);
 
   const handleChildSelection = (childId: string) => {
     setSelectedChildren((prev) => {
@@ -112,36 +114,16 @@ const Checkout = () => {
   };
 
   const handlePayment = async () => {
-    if (!event) return;
+    if (!event || !user?.publicMetadata?.userId) return;
 
     const { totalAmount } = calculatePrices();
-
-    if (!user?.publicMetadata?.userId) {
-      setError("User ID not found");
-      return;
-    }
-
-    useEffect(() => {
-      const testAPI = async () => {
-        try {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_API_URL}/api/health-check`
-          );
-          console.log("API Status:", response.status);
-        } catch (error) {
-          console.error("API Connection Error:", error);
-        }
-      };
-
-      testAPI();
-    }, []);
 
     try {
       setIsProcessingOrder(true);
 
-      // Create order in your backend
+      // Create order in backend
       const orderResponse = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/orders`,
+        `${process.env.EXPO_PUBLIC_API_URL}/orders`,
         {
           method: "POST",
           headers: {
@@ -153,6 +135,7 @@ const Checkout = () => {
             buyer: user.publicMetadata.userId,
             status: "PENDING",
             children: selectedChildren,
+            createdAt: new Date(),
           }),
         }
       );
@@ -175,8 +158,8 @@ const Checkout = () => {
 
       if (paymentData.razorpay_payment_id) {
         // Update order status
-        await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/orders/${orderData._id}`,
+        const updatedOrderResponse = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/orders/${orderData._id}`,
           {
             method: "PUT",
             headers: {
@@ -185,18 +168,57 @@ const Checkout = () => {
             body: JSON.stringify({
               status: "SUCCESS",
               razorpayPaymentId: paymentData.razorpay_payment_id,
+              updatedAt: new Date(),
             }),
           }
         );
 
-        // Navigate to confirmation screen
-        router.push(
-          `/confirmation?status=success&eventTitle=${event.title}&payment_id=${paymentData.razorpay_payment_id}`
-        );
+        const updatedOrder = await updatedOrderResponse.json();
+
+        // Create tickets
+        try {
+          const ticketResponse = await fetch(
+            `${process.env.EXPO_PUBLIC_API_URL}/tickets`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(updatedOrder),
+            }
+          );
+
+          if (!ticketResponse.ok) {
+            throw new Error("Failed to create tickets");
+          }
+
+          const ticketsData = await ticketResponse.json();
+          console.log("Tickets created successfully:", ticketsData);
+
+          // Navigate to confirmation screen
+          router.push(`/confirmation?${new URLSearchParams({
+            status: "success",
+            eventTitle: event.title,
+            date: event.startDateTime,
+            imageUrl: event.imageUrl,
+            event_id: event._id,
+            payment_id: paymentData.razorpay_payment_id,
+            children: selectedChildren.join(","),
+            totalAmount: totalAmount.toString(),
+          }).toString()}`);
+        } catch (ticketError) {
+          console.error("Error creating tickets:", ticketError);
+          throw ticketError;
+        }
       }
     } catch (error) {
       console.error("Payment failed:", error);
       setError("Payment failed. Please try again.");
+      router.push(`/confirmation?${new URLSearchParams({
+        status: "failed",
+        eventTitle: event.title,
+        error: "Payment failed. Please try again.",
+      }).toString()}`);
     } finally {
       setIsProcessingOrder(false);
       setIsCheckoutModalOpen(false);
@@ -244,11 +266,7 @@ const Checkout = () => {
                 >
                   <Text className="flex-1">{`${child.firstName} ${child.lastName}`}</Text>
                   {selectedChildren.includes(child._id) && (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={24}
-                      color="#624cf5"
-                    />
+                    <Ionicons name="checkmark-circle" size={24} color="#624cf5" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -372,6 +390,10 @@ const Checkout = () => {
           <Text className="text-white font-semibold">
             {isLoading
               ? "Processing..."
+              : event.isFree
+              ? `Get ${selectedChildren.length || ""} Ticket${
+                  selectedChildren.length !== 1 ? "s" : ""
+                }`
               : `Book ${selectedChildren.length || ""} Ticket${
                   selectedChildren.length !== 1 ? "s" : ""
                 }`}

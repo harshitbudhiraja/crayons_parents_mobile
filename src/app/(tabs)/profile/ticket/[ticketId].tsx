@@ -1,68 +1,174 @@
+import { View, ActivityIndicator, Text } from "react-native";
+import { useState, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useAuth } from "@clerk/clerk-expo";
 import TicketDetails from "@/components/TicketDetails";
 
-export default function TicketScreen() {
-  // Fetch ticket data here
-  const ticketData = {
-    _id: "67ae3c19f4ceea995c85860a",
-    orderId: "67ae3c00f4ceea995c858607",
-    totalAmount: 623.04,
-    event: {
-      address: {
-        street: "IIT Delhi Main Road",
-        city: "New Delhi",
-        state: "Delhi",
-        postalCode: "110016",
-        country: "India",
-        latitude: 28.5443886,
-        longitude: 77.19271239999999,
-      },
-      instructor: {
-        name: "Jatin",
-        description: "Something",
-        imageUrl:
-          "https://utfs.io/f/fe35f660-94b1-4544-b16e-ecc0dbac5714-k4c48b.png",
-        url: "https://github.com/adrianhajdin/event_platform",
-      },
-      _id: "67a7206817ae28b1c57ae990",
-      title: "Test-File-Upload",
-      description: "random description",
-      overview: "Something",
-      locationType: "In-Person" as "In-Person" | "Online" | "To-Be-Decided",
-      ageRange: { min: 7, max: 14, _id: "67a7206817ae28b1c57ae991" },
-      imageUrl:
-        "https://utfs.io/f/b674ee57-d004-4302-a458-456ff196e13a-ng6bfi.jpg.webp",
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
 
-      startDateTime: new Date("2025-02-18T10:00:00.000Z"),
-      endDateTime: new Date("2025-02-18T11:30:00.000Z"),
-      price: "528",
-      isFree: false,
-      category: { _id: "67a0d00934e063120e6d7697", name: "Block Building" },
-      organizer: {
-        _id: "67a488c1887f16ef0e544e9d",
-        username: "jatinitest",
-        firstName: "Jatin",
-        lastName: "Tilwani",
-      },
-      no_of_tickets: 62,
-      createdAt: "2025-02-08T09:14:16.173Z",
-      __v: 0,
-    },
-    buyer: {
-      _id: "67ab3e97ae7270fa912e4eb0",
-      firstName: "Jatin",
-      lastName: "Tilwani",
-    },
-    child: {
-      _id: "67ae2685f4ceea995c8585e0",
-      firstName: "Test",
-      lastName: "Child",
-      dob: new Date("2025-02-03T00:00:00.000Z"),
-      gender: "Male",
-      parent_id: "67ab3e97ae7270fa912e4eb0",
-      __v: 0,
-    },
-    createdAt: new Date("2025-02-13T18:38:17.065Z"),
-    __v: 0,
+interface Instructor {
+  name: string;
+  description: string;
+  imageUrl: string;
+  url: string;
+}
+
+interface AgeRange {
+  min: number;
+  max: number;
+  _id: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+}
+
+interface Organizer {
+  _id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  overview: string;
+  locationType: "In-Person" | "Online" | "To-Be-Decided";
+  address: Address;
+  instructor: Instructor;
+  ageRange: AgeRange;
+  imageUrl: string;
+  startDateTime: string;
+  endDateTime: string;
+  price: string;
+  isFree: boolean;
+  category: Category;
+  organizer: Organizer;
+  no_of_tickets: number;
+  createdAt: string;
+}
+
+interface Ticket {
+  _id: string;
+  orderId: string;
+  totalAmount: number;
+  event: Event;
+  buyer: {
+    _id: string;
+    firstName: string;
+    lastName: string;
   };
-  return <TicketDetails ticket={ticketData} userId={"someuserId"} />;
+  child: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    dob: string;
+    gender: string;
+    parent_id: string;
+  };
+  createdAt: string;
+}
+
+export default function TicketScreen() {
+  const { ticketId } = useLocalSearchParams();
+  const { userId } = useAuth();
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const fetchTicket = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/tickets/${ticketId}`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch ticket details');
+        }
+
+        const data = await response.json();
+
+        if (isSubscribed) {
+          // Convert date strings to Date objects where needed
+          const ticketWithDates = {
+            ...data,
+            event: {
+              ...data.event,
+              startDateTime: new Date(data.event.startDateTime),
+              endDateTime: new Date(data.event.endDateTime),
+            },
+            child: {
+              ...data.child,
+              dob: new Date(data.child.dob),
+            },
+            createdAt: new Date(data.createdAt),
+          };
+          setTicket(ticketWithDates);
+        }
+      } catch (err) {
+        if (isSubscribed) {
+          setError(err instanceof Error ? err.message : 'Failed to load ticket details');
+        }
+      } finally {
+        if (isSubscribed) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    if (ticketId) {
+      fetchTicket();
+    }
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [ticketId]);
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50 p-4">
+        <Text className="text-red-500 text-center">
+          {error}
+        </Text>
+      </View>
+    );
+  }
+
+  if (!ticket) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50 p-4">
+        <Text className="text-gray-500 text-center">
+          Ticket not found
+        </Text>
+      </View>
+    );
+  }
+
+  return <TicketDetails ticket={ticket} userId={userId as string} />;
 }

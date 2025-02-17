@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import fakeData from "crayons.events.json";
 import { router } from "expo-router";
 import useHttpHook from "@/hooks/useHttpHook";
+import { useUser } from "@clerk/clerk-expo";
 
 const PRIMARY_COLOR = "#624cf5";
 const { width } = Dimensions.get("screen");
@@ -77,12 +78,14 @@ const handleCategoryPress = (category) => {
 };
 
 const HomeScreen = () => {
+  const {user} = useUser();
   const [events, setEvents] = useState(fakeData);
   const { fetchData, isLoading } = useHttpHook();
   useEffect(() => {
-    fetchData(process.env.EXPO_PUBLIC_API_URL + "/events?limit=10").then((events) =>
-      setEvents(events.data)
-    );
+    fetchData(process.env.EXPO_PUBLIC_API_URL + "/events?limit=10").then((events) => {
+      setEvents(events.data);
+    });
+    console.log(user.publicMetadata.userId);
   }, []);
 
   const renderSectionHeader = (title : string) => (

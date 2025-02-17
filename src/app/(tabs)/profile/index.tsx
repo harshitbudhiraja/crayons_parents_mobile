@@ -11,17 +11,7 @@ import {
 } from "react-native";
 import { Tabs, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import {
-  User,
-  Settings,
-  Ticket,
-  Calendar,
-  Heart,
-  LogOut,
-  ChevronRight,
-  Bell,
-  CreditCard,
-} from "lucide-react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { useClerk, useUser } from "@clerk/clerk-expo";
 
 interface UserProfile {
@@ -42,7 +32,7 @@ interface MenuItem {
 const ProfileScreen = () => {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const {user} = useUser();
+  const { user } = useUser();
   const { signOut } = useClerk();
   // Mock user data - replace with actual user data
   const userProfile: UserProfile = {
@@ -52,39 +42,39 @@ const ProfileScreen = () => {
     joinedDate: "Member since Feb 2024",
   };
 
-  const menuItems: MenuItem[] = [
+  const menuItems = [
     {
-      icon: <Ticket size={24} color="#624cf5" />,
+      icon: <Ionicons name="ticket-outline" size={24} color="#624cf5" />,
       title: "My Tickets",
       subtitle: "View your upcoming & past event tickets",
       route: "/ticket",
     },
     {
-      icon: <Calendar size={24} color="#624cf5" />,
+      icon: <Ionicons name="calendar-outline" size={24} color="#624cf5" />,
       title: "My Events",
       subtitle: "Track events you're interested in",
       route: "/events",
     },
     {
-      icon: <Heart size={24} color="#624cf5" />,
+      icon: <Ionicons name="heart-outline" size={24} color="#624cf5" />,
       title: "Saved Events",
       subtitle: "Quick access to events you've bookmarked",
       route: "/saved",
     },
     {
-      icon: <CreditCard size={24} color="#624cf5" />,
+      icon: <Ionicons name="card-outline" size={24} color="#624cf5" />,
       title: "Payment Methods",
       subtitle: "Manage your payment options",
       route: "/payments",
     },
     {
-      icon: <Bell size={24} color="#624cf5" />,
+      icon: <Ionicons name="notifications-outline" size={24} color="#624cf5" />,
       title: "Notifications",
       subtitle: "Control your notification preferences",
       route: "/notifications",
     },
     {
-      icon: <Settings size={24} color="#624cf5" />,
+      icon: <Ionicons name="settings-outline" size={24} color="#624cf5" />,
       title: "Settings",
       subtitle: "Manage your account settings",
       route: "/settings",
@@ -134,13 +124,13 @@ const ProfileScreen = () => {
       onPress={() => router.push("profile/" + route)}
     >
       <View className="w-12 h-12 rounded-full bg-gray-50 items-center justify-center">
-        {icon}
+      {icon}
       </View>
       <View className="flex-1 ml-4">
-        <Text className="text-base font-semibold text-gray-800">{title}</Text>
-        <Text className="text-sm text-gray-500">{subtitle}</Text>
+      <Text className="text-base font-semibold text-gray-800">{title}</Text>
+      <Text className="text-sm text-gray-500">{subtitle}</Text>
       </View>
-      <ChevronRight size={20} color="#9ca3af" />
+      <Ionicons name="chevron-forward-outline" size={20} color="#9ca3af" />
     </TouchableOpacity>
   );
 
@@ -165,7 +155,9 @@ const ProfileScreen = () => {
               <Text className="text-xl font-bold text-gray-800">
                 {user.firstName} {user.lastName}
               </Text>
-              <Text className="text-gray-500">{user.emailAddresses[0].emailAddress}</Text>
+              <Text className="text-gray-500">
+                {user.emailAddresses[0].emailAddress}
+              </Text>
               <Text className="text-sm text-gray-400 mt-1">
                 {new Date(user.createdAt).toLocaleDateString()}
               </Text>
@@ -173,14 +165,14 @@ const ProfileScreen = () => {
           </View>
 
           <TouchableOpacity
-            className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
-            onPress={handleUserEdit}
-          >
-            <User size={20} color="#624cf5" />
-            <Text className="ml-2 text-[#624cf5] font-medium">
-              Edit Profile
-            </Text>
-          </TouchableOpacity>
+      className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
+      onPress={handleUserEdit}
+    >
+      <Ionicons name="person-outline" size={20} color="#624cf5" />
+      <Text className="ml-2 text-[#624cf5] font-medium">
+        Edit Profile
+      </Text>
+    </TouchableOpacity>
         </View>
 
         {/* Quick Stats */}
@@ -207,9 +199,9 @@ const ProfileScreen = () => {
           className="flex-row items-center px-4 py-4 bg-white mt-2 border-t border-b border-gray-100"
           onPress={handleLogout}
         >
-          <View className="w-12 h-12 rounded-full bg-red-50 items-center justify-center">
-            <LogOut size={24} color="#ef4444" />
-          </View>
+           <View className="w-12 h-12 rounded-full bg-red-50 items-center justify-center">
+      <Ionicons name="log-out-outline" size={24} color="#ef4444" />
+    </View>
           <View className="flex-1 ml-4">
             <Text className="text-base font-semibold text-red-500">Logout</Text>
             <Text className="text-sm text-gray-500">
