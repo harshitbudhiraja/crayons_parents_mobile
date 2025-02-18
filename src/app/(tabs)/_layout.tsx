@@ -3,7 +3,7 @@ import { Redirect, Slot } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
 export default function Layout() {
-  const { isSignedIn, isLoaded } = useAuth(); // Ensure `isLoaded` is checked
+  const { isSignedIn, isLoaded } = useAuth(); 
 
   if (!isLoaded) {
     return (

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Tabs, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import { useClerk, useUser } from "@clerk/clerk-expo";
 
 interface UserProfile {
@@ -43,6 +43,12 @@ const ProfileScreen = () => {
   };
 
   const menuItems = [
+    {
+      icon: <Ionicons name="people-outline" size={24} color="#624cf5" />,
+      title: "Child Profiles",
+      subtitle: "Manage your children's profiles",
+      route: "/child-profiles",
+    },
     {
       icon: <Ionicons name="ticket-outline" size={24} color="#624cf5" />,
       title: "My Tickets",
@@ -96,8 +102,8 @@ const ProfileScreen = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => {
-          signOut();
+        onPress: async () => {
+          await signOut();
           router.push("/login");
         },
       },
@@ -106,7 +112,6 @@ const ProfileScreen = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    // Simulate data refresh
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -124,11 +129,11 @@ const ProfileScreen = () => {
       onPress={() => router.push("profile/" + route)}
     >
       <View className="w-12 h-12 rounded-full bg-gray-50 items-center justify-center">
-      {icon}
+        {icon}
       </View>
       <View className="flex-1 ml-4">
-      <Text className="text-base font-semibold text-gray-800">{title}</Text>
-      <Text className="text-sm text-gray-500">{subtitle}</Text>
+        <Text className="text-base font-semibold text-gray-800">{title}</Text>
+        <Text className="text-sm text-gray-500">{subtitle}</Text>
       </View>
       <Ionicons name="chevron-forward-outline" size={20} color="#9ca3af" />
     </TouchableOpacity>
@@ -165,14 +170,14 @@ const ProfileScreen = () => {
           </View>
 
           <TouchableOpacity
-      className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
-      onPress={handleUserEdit}
-    >
-      <Ionicons name="person-outline" size={20} color="#624cf5" />
-      <Text className="ml-2 text-[#624cf5] font-medium">
-        Edit Profile
-      </Text>
-    </TouchableOpacity>
+            className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
+            onPress={handleUserEdit}
+          >
+            <Ionicons name="person-outline" size={20} color="#624cf5" />
+            <Text className="ml-2 text-[#624cf5] font-medium">
+              Edit Profile
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Quick Stats */}
@@ -199,9 +204,9 @@ const ProfileScreen = () => {
           className="flex-row items-center px-4 py-4 bg-white mt-2 border-t border-b border-gray-100"
           onPress={handleLogout}
         >
-           <View className="w-12 h-12 rounded-full bg-red-50 items-center justify-center">
-      <Ionicons name="log-out-outline" size={24} color="#ef4444" />
-    </View>
+          <View className="w-12 h-12 rounded-full bg-red-50 items-center justify-center">
+            <Ionicons name="log-out-outline" size={24} color="#ef4444" />
+          </View>
           <View className="flex-1 ml-4">
             <Text className="text-base font-semibold text-red-500">Logout</Text>
             <Text className="text-sm text-gray-500">

@@ -16,7 +16,7 @@ const useHttpHook = () => {
         },
         body: body ? JSON.stringify(body) : null,
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       setError(error);
       console.error(error);

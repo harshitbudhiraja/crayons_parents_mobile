@@ -140,7 +140,7 @@ const TicketDetails = ({ ticket, userId }: TicketDetailsProps) => {
           <View className="bg-white rounded-2xl p-6 shadow-sm">
             <View className="items-center mb-6">
               <QRCode
-                value={`https://caryons.co.in/tickets/${ticket._id}`}
+                value={`https://crayons.co.in/tickets/${ticket._id}`}
                 size={180}
                 logoBackgroundColor="white"
               />

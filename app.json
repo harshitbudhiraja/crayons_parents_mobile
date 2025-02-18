@@ -7,7 +7,8 @@
       "output": "static"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-location"
     ],
     "name": "Parent",
     "slug": "parents-app",
@@ -21,7 +22,17 @@
     },
     "owner": "jatintilwani",
     "android": {
-      "package": "com.jatintilwani.parentsapp"
+      "package": "com.jatintilwani.parentsapp",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location.",
+        "NSLocationAlwaysUsageDescription": "This app needs access to your location in the background."
+      }
     }
   }
 }

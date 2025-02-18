@@ -5,8 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import EventCard from '@/components/EventCard';
 import { router, useLocalSearchParams } from 'expo-router';
 import fakeEvents from 'crayons.events.json';
+import useLocation from '@/hooks/useLocation';
 
 const CategoryDetailsScreen = () => {
+  const {coords} = useLocation()
   const { id } = useLocalSearchParams() as { id: string };
   const PRIMARY_COLOR = "#624cf5";
   
@@ -30,7 +32,7 @@ const CategoryDetailsScreen = () => {
     <FlatList
       data={events}
       horizontal={horizontal}
-      renderItem={({ item }) => <EventCard event={item} />}
+      renderItem={({ item }) => <EventCard event={item} coords={coords} />}
       keyExtractor={(item) => item._id.$oid}
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{

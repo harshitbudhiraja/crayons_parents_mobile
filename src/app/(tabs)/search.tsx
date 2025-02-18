@@ -8,20 +8,15 @@ import {
   FlatList,
   ActivityIndicator,
   Image,
-  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { debounce } from "@/lib/utils";
-import mockEvents from "crayons.events.json";
 import { router } from "expo-router";
 
-const { width } = Dimensions.get("window");
-
-const SearchScreen = ({ navigation }) => {
+const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [recentSearches, setRecentSearches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const searchInput = useRef(null);
@@ -33,7 +28,7 @@ const SearchScreen = ({ navigation }) => {
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     return events.filter((event) => {
-      const eventDate = new Date(event.startDateTime.$date);
+      const eventDate = new Date(event.startDateTime);
 
       switch (filter) {
         case "Free":
@@ -52,29 +47,53 @@ const SearchScreen = ({ navigation }) => {
     });
   };
 
-  const debouncedSearch = useCallback(
-    debounce((query, filter) => {
-      setIsLoading(true);
-      // Simulate API call with mock data
-      setTimeout(() => {
-        let filteredResults = mockEvents.filter(
-          (item) =>
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
-        );
+  const fetchEvents = async (query, filter) => {
+    try {
+      const params = new URLSearchParams({
+        query: query,
+        limit: '20',
+        page: '1'
+      });
 
-        // Apply ad ditional filters
-        if (filter !== "All") {
-          filteredResults = filterEvents(filteredResults, filter);
-        }
-        setSearchResults(filteredResults);
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/events?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const responseData = await response.json();
+      
+      const events = responseData.data || [];
+
+      if (filter !== "All") {
+        return filterEvents(events, filter);
+      }
+
+      return events;
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+  };
+
+  const debouncedSearch = useCallback(
+    debounce(async (query, filter) => {
+      setIsLoading(true);
+      try {
+        const results = await fetchEvents(query, filter);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
         setIsLoading(false);
-      }, 500);
+      }
     }, 300),
     []
   );
 
-  // Effect to rerun search when filter changes
   useFocusEffect(
     useCallback(() => {
       if (searchQuery) {
@@ -100,7 +119,7 @@ const SearchScreen = ({ navigation }) => {
   const renderSearchResult = ({ item }) => (
     <TouchableOpacity
       className="flex-row p-4 border-b border-gray-100"
-      onPress={() => router.push("event/" + item._id.$oid)}
+      onPress={() => router.push(`/event/${item._id}`)}
     >
       <Image
         source={{ uri: item.imageUrl }}
@@ -122,7 +141,7 @@ const SearchScreen = ({ navigation }) => {
             {formatPrice(item.price, item.isFree)}
           </Text>
           <Text className="text-xs text-gray-500">
-            {formatDate(item.startDateTime.$date)}
+            {formatDate(item.startDateTime)}
           </Text>
         </View>
       </View>
@@ -224,7 +243,7 @@ const SearchScreen = ({ navigation }) => {
         <FlatList
           data={searchResults}
           renderItem={renderSearchResult}
-          keyExtractor={(item) => item._id.$oid}
+          keyExtractor={(item) => item._id}
           contentContainerStyle={{ flexGrow: 1 }}
           ListEmptyComponent={searchQuery ? <EmptyState /> : null}
         />

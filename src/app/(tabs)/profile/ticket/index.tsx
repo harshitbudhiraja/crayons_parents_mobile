@@ -38,18 +38,24 @@ const TicketsScreen = () => {
   const [tickets, setTickets] = useState<ITicketItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const {getToken} = useAuth();
   useEffect(() => {
     let isSubscribed = true;
 
     const fetchTickets = async () => {
       if (!user.publicMetadata.userId) return;
-      
       try {
+        const token = await getToken();
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/tickets/user?userId=${user.publicMetadata.userId}`);
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/tickets/user?userId=${user.publicMetadata.userId}`, {
+          method : "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch tickets');
         }

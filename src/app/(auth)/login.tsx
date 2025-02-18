@@ -32,10 +32,11 @@ const LoginScreen = () => {
     try {
       const { createdSessionId, setActive } = await startSSOFlow({
         strategy: "oauth_google",
+        redirectUrl: "acme://clerk-sso-callback",
       });
 
       if (createdSessionId) {
-        setActive!({ session: createdSessionId });
+        await setActive!({ session: createdSessionId });
         router.push("/home");
       }
     } catch (err) {
