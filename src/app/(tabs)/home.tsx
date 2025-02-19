@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EventCard from "@/components/EventCard";
 import Carousel from "react-native-reanimated-carousel";
 import CategoryCard from "@/components/CategoryCard";
@@ -11,11 +11,14 @@ import {
   SafeAreaView,
   Dimensions,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import fakeData from "crayons.events.json";
 import { router } from "expo-router";
-
+import useHttpHook from "@/hooks/useHttpHook";
+import { useUser } from "@clerk/clerk-expo";
+import useLocation from "@/hooks/useLocation";
 const PRIMARY_COLOR = "#624cf5";
 const { width } = Dimensions.get("screen");
 const categories = [
@@ -70,15 +73,37 @@ const categories = [
 ];
 
 const handleCategoryPress = (category) => {
-  // Handle category selection
   router.push(`/category/${category.id}`);
   console.log(`Selected category: ${category.name}`);
 };
 
 const HomeScreen = () => {
-  const [events] = useState(fakeData);
+  const { location, loading, coords } = useLocation();
 
-  const renderSectionHeader = (title) => (
+  const { user } = useUser();
+  const [events, setEvents] = useState(fakeData);
+  const { fetchData, isLoading } = useHttpHook();
+
+  useEffect(() => {
+    fetchData(process.env.EXPO_PUBLIC_API_URL + "/events?limit=10").then(
+      (events) => {
+        setEvents(events.data);
+      }
+    );
+    console.log(user.publicMetadata.userId);
+  }, []);
+
+  // Helper function to safely get event ID
+  const getEventId = (event) => {
+    if (!event) return "";
+    // Handle different possible ID formats
+    if (typeof event._id === "string") return event._id;
+    if (event._id?.$oid) return event._id.$oid;
+    if (event.id) return event.id;
+    return JSON.stringify(event._id); // Fallback
+  };
+
+  const renderSectionHeader = (title: string) => (
     <Text className="text-lg font-bold text-gray-800 px-4 mb-2">{title}</Text>
   );
 
@@ -89,13 +114,15 @@ const HomeScreen = () => {
         className="p-4 flex-row justify-between items-center"
         style={{ backgroundColor: PRIMARY_COLOR }}
       >
-        <Text className="text-white text-xl font-bold">Discover Events</Text>
+        <View className="flex-row items-center space-x-2">
+          <Ionicons name="location-sharp" size={24} color="white" />
+          <Text className={`text-white text-sm font-bold capitalize ${loading && "animate-pulse"}`}>
+            {loading ? "Locating..." : location ? location : "Discover Events"}
+          </Text>
+        </View>
         <View className="flex-row space-x-4">
           <TouchableOpacity onPress={() => router.push("search")}>
             <Ionicons name="search" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="filter" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -107,8 +134,9 @@ const HomeScreen = () => {
           width={width}
           height={250}
           data={events}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <Image
+              key={`carousel-${getEventId(item)}-${index}`}
               source={{ uri: item.imageUrl }}
               style={{ width: width, height: 250, resizeMode: "cover" }}
             />
@@ -128,7 +156,7 @@ const HomeScreen = () => {
                 onPress={() => handleCategoryPress(item)}
               />
             )}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item) => `category-${item.id}`}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{
               paddingHorizontal: 16,
@@ -139,33 +167,41 @@ const HomeScreen = () => {
         {/* Upcoming Events Section */}
         <View className="py-4">
           {renderSectionHeader("Upcoming Events")}
-          <FlatList
-            data={events}
-            horizontal={true}
-            renderItem={({ item }) => <EventCard event={item} />}
-            keyExtractor={(item) => item._id.$oid}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-              columnGap: 16,
-            }}
-          />
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <FlatList
+              data={events}
+              horizontal={true}
+              renderItem={({ item }) => <EventCard event={item} coords={coords} />}
+              keyExtractor={(item) => `upcoming-${getEventId(item)}`}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                columnGap: 16,
+              }}
+            />
+          )}
         </View>
 
         {/* Popular Events Section */}
         <View className="py-4">
           {renderSectionHeader("Popular Events")}
-          <FlatList
-            data={events}
-            horizontal={true}
-            renderItem={({ item }) => <EventCard event={item} />}
-            keyExtractor={(item) => item._id.$oid}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-              columnGap: 16,
-            }}
-          />
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <FlatList
+              data={events}
+              horizontal={true}
+              renderItem={({ item }) => <EventCard event={item} coords={coords} />}
+              keyExtractor={(item) => `popular-${getEventId(item)}`}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                columnGap: 16,
+              }}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -3,8 +3,8 @@ import { tokenCache } from "cache";
 import { Slot } from "expo-router";
 import { View } from "react-native";
 import Navigation from "@/components/Navigation";
-import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
-
+import { ClerkLoaded, ClerkProvider, SignedIn } from "@clerk/clerk-expo";
+import "react-native-gesture-handler";
 export default function Layout() {
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
   if (!publishableKey) {
@@ -18,7 +18,9 @@ export default function Layout() {
           <View style={{ flex: 1 }}>
             <Slot />
           </View>
-          <Navigation />
+          <SignedIn>
+            <Navigation />
+          </SignedIn>
         </View>
       </ClerkLoaded>
     </ClerkProvider>
