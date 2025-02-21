@@ -5,12 +5,15 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import { useLocalSearchParams, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import useHttpHook from "@/hooks/useHttpHook";
 import { router } from "expo-router";
+import { useUser } from "@clerk/clerk-expo";
+
 // Define types for better type safety
 interface Address {
   street: string;
@@ -34,6 +37,7 @@ interface Event {
   price: number;
   address: Address;
   instructor: Instructor;
+  isWishlisted?: boolean;
 }
 
 // Text truncation component
@@ -77,6 +81,9 @@ export default function EventDetails() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const { isLoading, error, fetchData } = useHttpHook();
   const [eventData, setEventData] = useState<Event | null>(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     const getEventDetails = async () => {
@@ -86,17 +93,27 @@ export default function EventDetails() {
       }
 
       try {
+        // Fetch event details
         const event = await fetchData(
           process.env.EXPO_PUBLIC_API_URL + `/events/${eventId}`
         );
         setEventData(event);
+        
+        // Check if event is already wishlisted
+        if (user?.publicMetadata?.userId) {
+          const userId = user.publicMetadata.userId as string;
+          const wishlistStatus = await fetchData(
+            `${process.env.EXPO_PUBLIC_API_URL}/users/${userId}/wishlist/status?eventId=${eventId}`
+          );
+          setIsWishlisted(wishlistStatus?.isWishlisted || false);
+        }
       } catch (err) {
         console.error("Failed to fetch event details:", err);
       }
     };
 
     getEventDetails();
-  }, [eventId]);
+  }, [eventId, user]);
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -114,10 +131,46 @@ export default function EventDetails() {
     });
   };
 
+  const toggleWishlist = async () => {
+    if (!user || isTogglingWishlist) return;
+
+    const userId = user.publicMetadata.userId as string;
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+
+    setIsTogglingWishlist(true);
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/users/${userId}/wishlist`,
+        {
+          method: isWishlisted ? "DELETE" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            eventId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setIsWishlisted(!isWishlisted);
+      } else {
+        console.error("Failed to update wishlist");
+      }
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    } finally {
+      setIsTogglingWishlist(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#624cf5" />
       </View>
     );
   }
@@ -154,37 +207,64 @@ export default function EventDetails() {
         }}
       />
       <View className="flex-1 bg-white">
-        <View className="flex-row items-center p-4 bg-white">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4">
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text className="text-xl font-bold">Event Details</Text>
-        </View>
-
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          <Image
-            source={{ uri: eventData.imageUrl }}
-            className="w-full h-64 rounded-lg mb-4"
-            resizeMode="cover"
-          />
+          <View className="relative">
+            <Image
+              source={{ uri: eventData.imageUrl }}
+              className="w-full h-80"
+              resizeMode="cover"
+            />
 
-          <View className="px-4">
-            <Text className="text-2xl font-bold mb-2">{eventData.title}</Text>
+            {/* Gradient overlay for buttons */}
+            <View className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/60 to-transparent" />
+
+            {/* Back button */}
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="absolute top-6 left-4 bg-black/30 p-2 rounded-full"
+              style={styles.iconButton}
+            >
+              <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+
+            {/* Wishlist button */}
+            <TouchableOpacity
+              onPress={toggleWishlist}
+              className="absolute top-6 right-4 bg-black/30 p-2 rounded-full"
+              style={styles.iconButton}
+              disabled={isTogglingWishlist}
+            >
+              {isTogglingWishlist ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Ionicons
+                  name={isWishlisted ? "heart" : "heart-outline"}
+                  size={24}
+                  color={isWishlisted ? "#ff4081" : "white"}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View className="px-4 -mt-4 bg-white rounded-t-3xl">
+            <Text className="text-2xl font-bold mt-6 mb-2">
+              {eventData.title}
+            </Text>
             <TruncatedText
               text={eventData.description}
               limit={150}
               className="text-gray-600 mb-4"
             />
 
-            <View className="mb-4 space-y-2">
+            <View className="mb-6 space-y-3">
               <View className="flex-row items-center">
                 <Ionicons
                   name="calendar-outline"
                   size={20}
-                  color="#666"
+                  color="#624cf5"
                   className="mr-2"
                 />
-                <Text className="ml-2">
+                <Text className="ml-2 text-gray-700">
                   {formatDate(eventData.startDateTime)}
                 </Text>
               </View>
@@ -192,10 +272,10 @@ export default function EventDetails() {
                 <Ionicons
                   name="time-outline"
                   size={20}
-                  color="#666"
+                  color="#624cf5"
                   className="mr-2"
                 />
-                <Text className="ml-2">
+                <Text className="ml-2 text-gray-700">
                   {formatTime(eventData.startDateTime)} -{" "}
                   {formatTime(eventData.endDateTime)}
                 </Text>
@@ -204,10 +284,10 @@ export default function EventDetails() {
                 <Ionicons
                   name="location-outline"
                   size={20}
-                  color="#666"
+                  color="#624cf5"
                   className="mr-2"
                 />
-                <Text className="ml-2">
+                <Text className="ml-2 text-gray-700">
                   {eventData.address.street}, {eventData.address.city}
                 </Text>
               </View>
@@ -215,10 +295,12 @@ export default function EventDetails() {
                 <Ionicons
                   name="cash-outline"
                   size={20}
-                  color="#666"
+                  color="#624cf5"
                   className="mr-2"
                 />
-                <Text className="ml-2">₹{eventData.price}</Text>
+                <Text className="ml-2 text-gray-700 font-semibold">
+                  ₹{eventData.price}
+                </Text>
               </View>
             </View>
 
@@ -226,17 +308,19 @@ export default function EventDetails() {
             <TruncatedText
               text={eventData.overview}
               limit={300}
-              className="text-gray-700 mb-4"
+              className="text-gray-700 mb-6"
             />
 
-            <View className="bg-gray-100 p-4 rounded-lg mb-4">
+            <View className="bg-gray-50 p-4 rounded-xl mb-6 shadow-sm">
               <View className="flex-row items-center mb-2">
                 <Image
                   source={{ uri: eventData.instructor.imageUrl }}
-                  className="w-10 h-10 rounded-full mr-3"
+                  className="w-12 h-12 rounded-full mr-3"
                 />
                 <View>
-                  <Text className="font-bold">{eventData.instructor.name}</Text>
+                  <Text className="font-bold text-base">
+                    {eventData.instructor.name}
+                  </Text>
                   <Text className="text-gray-600 text-sm">
                     Event Instructor
                   </Text>
@@ -250,10 +334,12 @@ export default function EventDetails() {
             </View>
 
             <TouchableOpacity
-              className="bg-[#624cf5] p-4 rounded-lg items-center mb-6"
+              className="bg-[#624cf5] p-4 rounded-xl items-center mb-8"
               onPress={() => router.push(`/event/${eventId}/checkout`)}
             >
-              <Text className="text-white font-bold">Register Now</Text>
+              <Text className="text-white font-bold text-base">
+                Register Now
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -261,3 +347,13 @@ export default function EventDetails() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  iconButton: {
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+});

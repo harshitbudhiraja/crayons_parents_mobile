@@ -12,6 +12,7 @@ import {
   Dimensions,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import fakeData from "crayons.events.json";
@@ -19,6 +20,7 @@ import { router } from "expo-router";
 import useHttpHook from "@/hooks/useHttpHook";
 import { useUser } from "@clerk/clerk-expo";
 import useLocation from "@/hooks/useLocation";
+import { StatusBar } from "expo-status-bar";
 const PRIMARY_COLOR = "#624cf5";
 const { width } = Dimensions.get("screen");
 const categories = [
@@ -83,7 +85,13 @@ const HomeScreen = () => {
   const { user } = useUser();
   const [events, setEvents] = useState(fakeData);
   const { fetchData, isLoading } = useHttpHook();
-
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   useEffect(() => {
     fetchData(process.env.EXPO_PUBLIC_API_URL + "/events?limit=10").then(
       (events) => {
@@ -116,7 +124,11 @@ const HomeScreen = () => {
       >
         <View className="flex-row items-center space-x-2">
           <Ionicons name="location-sharp" size={24} color="white" />
-          <Text className={`text-white text-sm font-bold capitalize ${loading && "animate-pulse"}`}>
+          <Text
+            className={`text-white text-sm font-bold capitalize ${
+              loading && "animate-pulse"
+            }`}
+          >
             {loading ? "Locating..." : location ? location : "Discover Events"}
           </Text>
         </View>
@@ -128,8 +140,15 @@ const HomeScreen = () => {
       </View>
 
       {/* Main Content */}
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+      >
         {/* Image Carousel */}
+        {/* !! This carousel should have other images */}
         <Carousel
           width={width}
           height={250}
@@ -143,6 +162,7 @@ const HomeScreen = () => {
           )}
           scrollAnimationDuration={600}
           loop
+          autoPlay
         />
 
         <View className="py-4">
@@ -173,7 +193,9 @@ const HomeScreen = () => {
             <FlatList
               data={events}
               horizontal={true}
-              renderItem={({ item }) => <EventCard event={item} coords={coords} />}
+              renderItem={({ item }) => (
+                <EventCard event={item} coords={coords} />
+              )}
               keyExtractor={(item) => `upcoming-${getEventId(item)}`}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
@@ -193,7 +215,9 @@ const HomeScreen = () => {
             <FlatList
               data={events}
               horizontal={true}
-              renderItem={({ item }) => <EventCard event={item} coords={coords} />}
+              renderItem={({ item }) => (
+                <EventCard event={item} coords={coords} />
+              )}
               keyExtractor={(item) => `popular-${getEventId(item)}`}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
