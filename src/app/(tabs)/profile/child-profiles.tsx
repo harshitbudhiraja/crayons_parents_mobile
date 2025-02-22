@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from "@clerk/clerk-expo";
 import ChildFormModal from "@/components/ChildFormModal";
+import Header from "@/components/Header";
 
 interface ChildProfile {
   _id: string;
@@ -21,11 +24,13 @@ interface ChildProfile {
 }
 
 const ChildProfilesScreen = () => {
-  const router = useRouter();
   const { user } = useUser();
+  const router = useRouter();
   const [children, setChildren] = useState<ChildProfile[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedChild, setSelectedChild] = useState<ChildProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchChildren = async () => {
     try {
@@ -36,7 +41,9 @@ const ChildProfilesScreen = () => {
       setChildren(data.data);
     } catch (error) {
       console.error('Error fetching children:', error);
-      Alert.alert('Error', 'Failed to load children profiles');
+      setError('Failed to load children profiles');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,11 +57,27 @@ const ChildProfilesScreen = () => {
     setSelectedChild(null);
   };
 
-  if(!children){
+  if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
-        <View className="p-4">
-          <Text>Loading...</Text>
+        <StatusBar barStyle="dark-content" />
+        <Header title="Child Profiles" />
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        <StatusBar barStyle="dark-content" />
+        <Header title="Child Profiles" />
+        <View className="flex-1 justify-center items-center p-4">
+          <Text className="text-red-500 text-center">
+            {error}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -62,9 +85,10 @@ const ChildProfilesScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle="dark-content" />
+      <Header title="Child Profiles" />
       <View className="p-4">
-        <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-2xl font-bold text-gray-800">Child Profiles</Text>
+        <View className="flex-row justify-center items-center mb-6">
           <TouchableOpacity 
             className="bg-[#624cf5] px-4 py-2 rounded-lg"
             onPress={() => {

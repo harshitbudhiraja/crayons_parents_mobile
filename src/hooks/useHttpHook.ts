@@ -3,18 +3,22 @@ import { useState } from "react";
 const useHttpHook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const fetchData = async (
     url: string,
-    body: null | object = null
+    options?: {
+      method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      body?: object
+    }
   ): Promise<any> => {
     setIsLoading(true);
     try {
       const response = await fetch(url, {
-        method: body ? "POST" : "GET",
+        method: options?.method || 'GET',
         headers: {
           "Content-Type": "application/json",
         },
-        body: body ? JSON.stringify(body) : null,
+        body: options?.body ? JSON.stringify(options.body) : undefined,
       });
       return await response.json();
     } catch (error) {

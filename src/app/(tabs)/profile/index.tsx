@@ -9,17 +9,10 @@ import {
   RefreshControl,
   Alert,
 } from "react-native";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useClerk, useUser } from "@clerk/clerk-expo";
-
-interface UserProfile {
-  name: string;
-  email: string;
-  imageUrl: string;
-  joinedDate: string;
-}
 
 interface MenuItem {
   icon: React.ReactNode;
@@ -30,17 +23,9 @@ interface MenuItem {
 }
 
 const ProfileScreen = () => {
-  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useUser();
   const { signOut } = useClerk();
-  // Mock user data - replace with actual user data
-  const userProfile: UserProfile = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    imageUrl: "https://ui-avatars.com/api/?name=John+Doe",
-    joinedDate: "Member since Feb 2024",
-  };
 
   const menuItems = [
     {
@@ -63,9 +48,9 @@ const ProfileScreen = () => {
     },
     {
       icon: <Ionicons name="heart-outline" size={24} color="#624cf5" />,
-      title: "Saved Events",
+      title: "Wishlist",
       subtitle: "Quick access to events you've bookmarked",
-      route: "/saved",
+      route: "/wishlist",
     },
     {
       icon: <Ionicons name="card-outline" size={24} color="#624cf5" />,
@@ -86,12 +71,6 @@ const ProfileScreen = () => {
       route: "/settings",
     },
   ];
-
-  const handleUserEdit = () => {
-    // Handle user profile edit
-    // Maybe open the clerk modal or something
-    console.log("Edit profile clicked");
-  };
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -147,7 +126,6 @@ const ProfileScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        className="mt-4"
       >
         {/* Profile Header */}
         <View className="bg-white px-4 py-6 border-b border-gray-100">
@@ -171,7 +149,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             className="mt-4 bg-gray-50 px-4 py-3 rounded-xl flex-row items-center"
-            onPress={handleUserEdit}
+            onPress={() => router.push("/profile/editProfile")}
           >
             <Ionicons name="person-outline" size={20} color="#624cf5" />
             <Text className="ml-2 text-[#624cf5] font-medium">
